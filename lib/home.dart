@@ -19,7 +19,7 @@ import 'package:intl/intl.dart';
 
 import 'model/products_repository.dart';
 import 'model/product.dart';
-
+import 'detail.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -36,12 +36,9 @@ class HomePage extends StatefulWidget{
 class HomePageSate extends State<HomePage>{
   // TODO: Add a variable for Category (104)
 
-  List<Card> _buildGridCards(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-    List<Product> products = ProductsRepository.loadProducts(Category.all);
+  String dropdownValue = 'ASC';
 
-    if (products == null || products.isEmpty) {
-      return const <Card>[];
-    }
+  List<Card> _buildGridCards(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
 
     final ThemeData theme = Theme.of(context);
     final NumberFormat formatter = NumberFormat.simpleCurrency(
@@ -49,6 +46,7 @@ class HomePageSate extends State<HomePage>{
 
     return snapshot.data.docs.map((DocumentSnapshot document){
       return Card(
+
         clipBehavior: Clip.antiAlias,
         // TODO: Adjust card heights (103)
         child: Column(
@@ -78,7 +76,7 @@ class HomePageSate extends State<HomePage>{
                     ),
                     SizedBox(height: 8.0),
                     Text(
-                      document.data()['price'],
+                      document.data()['price'].toString(),
                       style: theme.textTheme.subtitle2,
                     ),
                   ],
@@ -101,6 +99,7 @@ class HomePageSate extends State<HomePage>{
                   ),
                 ),
                 onTap: (){
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailPage(productid: document.id)));
 
                 },
               ),
@@ -116,17 +115,27 @@ class HomePageSate extends State<HomePage>{
     // TODO: Return an AsymmetricView (104)
     // TODO: Pass Category variable to AsymmetricView (104)
 //    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    CollectionReference products = FirebaseFirestore.instance.collection('products');
+    Query products;
+  if(dropdownValue == 'ASC'){
+     products = FirebaseFirestore.instance
+         .collection('products')
+         .orderBy('price', descending: false);
+  }else{
+    products = FirebaseFirestore.instance
+        .collection('products')
+        .orderBy('price', descending: true);
+  }
 
     return StreamBuilder<QuerySnapshot>(
       stream: products.snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+
         if (snapshot.hasError) {
           return Text('Something went wrong');
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text("Loading");
+          return Text("");
         }
         return Scaffold(
           appBar: AppBar(
@@ -138,7 +147,7 @@ class HomePageSate extends State<HomePage>{
                 semanticLabel: 'profile',
               ),
               onPressed: () {
-                print('Menu button');
+                Navigator.pushNamed(context, '/mypage');
               },
             ),
             title: Text('Main'),
@@ -156,56 +165,55 @@ class HomePageSate extends State<HomePage>{
               ),
             ],
           ),
-          body: Center(
-            child: GridView.count(
-              crossAxisCount: 2,
-              padding: EdgeInsets.all(16.0),
-              childAspectRatio: 8.0 / 9.0,
-              children: _buildGridCards(context,snapshot),
-            ),
+          body: Column(
+            children:[
+              Center(
+                child: DropdownButton<String>(
+                  value: dropdownValue,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  iconSize: 24,
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.black),
+
+                  underline: Container(
+                    height: 2,
+                    color: Colors.grey,
+                  ),
+                  onChanged: (String newValue) {
+                    setState(() {
+                      dropdownValue = newValue;
+                    });
+                  },
+                  items: <String>['ASC', 'DESC']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              Expanded(
+              child: Center(
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  padding: EdgeInsets.all(16.0),
+                  childAspectRatio: 8.0 / 9.0,
+                  children: _buildGridCards(context,snapshot),
+                ),
+              ),
+              ),
+
+            ]
           ),
+
+
           resizeToAvoidBottomInset: false,
         );
       },
     );
 
-//    return Scaffold(
-//      appBar: AppBar(
-//        backgroundColor: Colors.grey,
-//        leading: IconButton(
-//
-//          icon: Icon(
-//            Icons.person ,
-//            semanticLabel: 'profile',
-//          ),
-//          onPressed: () {
-//            print('Menu button');
-//          },
-//        ),
-//        title: Text('Main'),
-//        actions: <Widget>[
-//
-//          IconButton(
-//            icon: Icon(
-//              Icons.add,
-//              semanticLabel: 'add',
-//            ),
-//            onPressed: () async {
-////              await FirebaseAuth.instance.signOut().then((value) => Navigator.pushNamed(context, '/login'));
-//              Navigator.pushNamed(context, '/add');
-//            },
-//          ),
-//        ],
-//      ),
-//      body: Center(
-//        child: GridView.count(
-//          crossAxisCount: 2,
-//          padding: EdgeInsets.all(16.0),
-//          childAspectRatio: 8.0 / 9.0,
-//          children: _buildGridCards(context),
-//        ),
-//      ),
-//      resizeToAvoidBottomInset: false,
-//    );
+
   }
 }

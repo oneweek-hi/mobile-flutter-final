@@ -25,31 +25,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  bool _initialized = false;
-  bool _error = false;
-//
-//  // Define an async function to initialize FlutterFire
-//  void initializeFlutterFire() async {
-//    try {
-//      // Wait for Firebase to initialize and set `_initialized` state to true
-//      await Firebase.initializeApp();
-//      setState(() {
-//        _initialized = true;
-//      });
-//    } catch(e) {
-//      // Set `_error` state to true if Firebase initialization fails
-//      setState(() {
-//        _error = true;
-//      });
-//    }
-//  }
-//
-//  @override
-//  void initState() {
-//    initializeFlutterFire();
-//    super.initState();
-//  }
-
 
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
@@ -99,14 +74,14 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               child: Text('Google'),
               onPressed: () {
-                signInWithGoogle().then((value) => Navigator.pop(context));
+                signInWithGoogle().then((value) => Navigator.pushNamed(context, '/home'));
               },
             ),
 
             ElevatedButton(
               child: Text('Guest'),
               onPressed: () async {
-                signInWithAnonymous().then((value) => Navigator.pop(context));
+                signInWithAnonymous().then((value) => Navigator.pushNamed(context, '/home'));
               },
             ),
 

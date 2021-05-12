@@ -147,6 +147,7 @@ class _AddPageState extends State<AddPage> {
 
           actions: <Widget>[
 
+
             Padding(
               padding: EdgeInsets.all(1.0),
               child: TextButton(
@@ -156,12 +157,12 @@ class _AddPageState extends State<AddPage> {
                     uploadFile().then((value) => downloadURLExample().then((value) =>
                         FirebaseFirestore.instance.collection("products").add({
                       'productName':_productNameController.text,
-                      'price':_priceController.text,
+                      'price':int.parse(_priceController.text),
                       'description':_descriptionController.text,
                       'userId': FirebaseAuth.instance.currentUser.uid,
                       'heartNum':0,
-                      'CreatTime':timeNow,
-                      'ModifiedTime':timeNow,
+                      'CreatTime':FieldValue.serverTimestamp(),
+                      'ModifiedTime':FieldValue.serverTimestamp(),
                       'productImage': downloadURL,
                       'heartUIDs': [],
                     })

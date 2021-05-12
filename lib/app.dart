@@ -13,9 +13,13 @@
 // limitations under the License.
 
 
+import 'package:Shrine/mypage.dart';
+
 import 'package:flutter/material.dart';
 
 import 'add.dart';
+import 'detail.dart';
+import 'edit.dart';
 import 'home.dart';
 import 'login.dart';
 
@@ -35,6 +39,9 @@ class ShrineApp extends StatelessWidget {
       routes:{
         '/home' : (BuildContext context) => HomePage(),
         '/add' : (BuildContext context) => AddPage(),
+        '/mypage' : (BuildContext context) => MypPage(),
+        '/edit' : (BuildContext context) => EditPage(),
+
       },
       onGenerateRoute: _getRoute,
       // TODO: Add a theme (103)
